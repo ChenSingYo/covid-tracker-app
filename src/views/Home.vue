@@ -1,30 +1,33 @@
 <template>
   <main v-if="!loading">
-    <DataTitle :text="title" :dataDate="dataDate" />
-    <DataBoxes :stats="stats"/>
-    <CountrySelect
-      @get-country="getCountryData" :countries="countries" />
+    <DataTitle :dataDate="dataDate" :text="title" />
 
-      <button
-        @click="clearCountryData"
-        v-if="stats.Country"
-        class="bg-green-700 text-white rounded p-3 mt-10 focus:outline-none hover:bg-green-600">
-        Clear Country
-      </button>
+    <DataBoxes :stats="status" />
+
+    <CountrySelect :countries="countries" @get-country="getCountryData" />
+
+    <button
+      v-if="status.Country"
+      class="bg-green-700 text-white rounded p-3 mt-10 focus:outline-none hover:bg-green-600"
+      @click="clearCountryData"
+    >
+      Clear Country
+    </button>
   </main>
-  <main class="flex flex-col align-center justify-center text-center" v-else>
+
+  <main v-else class="flex flex-col align-center justify-center text-center">
     <div class="text-gray-500 text-3xl mt-10 mb-6">
       Fetching Data
     </div>
-    <img :src="loadingImage" class="w-24 m-auto" alt="">
+    <img :src="require('../assets/hourglass.gif')" alt="" class="w-24 m-auto" />
   </main>
 </template>
 
 <script>
-import DataTitle from '@/components/DataTitle'
+import CountrySelect from '@/components/CountrySelect'
 import DataBoxes from '@/components/DataBoxes'
-import CountrySelect from '@/components/CountrySelect.vue'
-
+import DataTitle from '@/components/DataTitle'
+import { ref } from 'vue'
 export default {
   name: 'Home',
   components: {
@@ -32,40 +35,44 @@ export default {
     DataBoxes,
     CountrySelect
   },
-  data () {
-    return {
-      loading: true,
-      title: 'Global',
-      dataDate: '',
-      stats: [],
-      countries: [],
-      loadingImage: require('../assets/hourglass.gif')
-    }
-  },
-  methods: {
-    async fetchCovidData () {
+  setup () {
+    const loading = ref(true)
+    const title = ref('Global')
+    const dataDate = ref('')
+    const status = ref({})
+    const countries = ref([])
+    const fetchCovidData = async () => {
       const res = await fetch('https://api.covid19api.com/summary')
-      const data = await res.json()
-      return data
-    },
-    getCountryData (country) {
-      this.stats = country
-      this.title = country.Country
-    },
-    async clearCountryData () {
-      this.loading = true
-      const data = await this.fetchCovidData()
-      this.title = 'Global'
-      this.stats = data.Global
-      this.loading = false
+      return await res.json()
     }
-  },
-  async created () {
-    const data = await this.fetchCovidData()
-    this.dataDate = data.Date
-    this.stats = data.Global
-    this.countries = data.Countries
-    this.loading = false
+    const getCountryData = country => {
+      status.value = country
+      title.value = country.Country
+    }
+    const clearCountryData = async () => {
+      loading.value = true
+      const data = await fetchCovidData()
+      title.value = 'Global'
+      status.value = data.Global
+      loading.value = false
+    }
+    const baseSetup = async () => {
+      const data = await fetchCovidData()
+      dataDate.value = data.Date
+      status.value = data.Global
+      countries.value = data.Countries
+      loading.value = false
+    }
+    baseSetup()
+    return {
+      loading,
+      title,
+      dataDate,
+      status,
+      countries,
+      getCountryData,
+      clearCountryData
+    }
   }
 }
 </script>

@@ -9,13 +9,15 @@
 
 <script>
 import dayjs from 'dayjs'
+import { computed } from 'vue'
 
 export default {
   name: 'DataTitle',
   props: ['text', 'dataDate'],
-  computed: {
-    timestamp: function () {
-      return dayjs(this.dataDate).format('MMMM DD, YYYY, h:mm:ss A')
+  setup (props) {
+    const { dataDate } = { props }
+    return {
+      timestamp: computed(() => dayjs(dataDate).format('MMMM D YYYY, h:mm:ss a'))
     }
   }
 }
