@@ -27,19 +27,23 @@
 </div>
 </template>
 
-<script>
-export default {
-  name: 'DataBoxes',
-  props: ['stats'],
-  setup () {
-    return {
-      numberWithCommas (x) {
-        return x.toString()
-          .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-      }
-    }
+<script setup>
+import { defineProps } from 'vue'
+
+const props = defineProps({
+  stats: {
+    type: Object,
+    require: true
   }
+})
+
+function numberWithCommas (x) {
+  return x.toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
+
+numberWithCommas(props)
+
 </script>
 
 <style>

@@ -7,20 +7,22 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import dayjs from 'dayjs'
-import { computed } from 'vue'
+import { computed, defineProps } from 'vue'
 
-export default {
-  name: 'DataTitle',
-  props: ['text', 'dataDate'],
-  setup (props) {
-    const { dataDate } = { props }
-    return {
-      timestamp: computed(() => dayjs(dataDate).format('MMMM D YYYY, h:mm:ss a'))
-    }
+const props = defineProps({
+  text: {
+    type: String,
+    require: true
+  },
+  dataDate: {
+    type: String,
+    require: true
   }
-}
+})
+
+const timestamp = computed(() => dayjs(props.dataDate).format('MMMM D YYYY, h:mm:ss a'))
 
 </script>
 

@@ -2,12 +2,12 @@
   <main v-if="!loading">
     <DataTitle :dataDate="dataDate" :text="title" />
 
-    <DataBoxes :stats="status" />
+    <DataBoxes :stats="stats" />
 
     <CountrySelect :countries="countries" @get-country="getCountryData" />
 
     <button
-      v-if="status.Country"
+      v-if="stats.Country"
       class="bg-green-700 text-white rounded p-3 mt-10 focus:outline-none hover:bg-green-600"
       @click="clearCountryData"
     >
@@ -23,56 +23,42 @@
   </main>
 </template>
 
-<script>
+<script setup>
 import CountrySelect from '@/components/CountrySelect'
 import DataBoxes from '@/components/DataBoxes'
 import DataTitle from '@/components/DataTitle'
 import { ref } from 'vue'
-export default {
-  name: 'Home',
-  components: {
-    DataTitle,
-    DataBoxes,
-    CountrySelect
-  },
-  setup () {
-    const loading = ref(true)
-    const title = ref('Global')
-    const dataDate = ref('')
-    const status = ref({})
-    const countries = ref([])
-    const fetchCovidData = async () => {
-      const res = await fetch('https://api.covid19api.com/summary')
-      return await res.json()
-    }
-    const getCountryData = country => {
-      status.value = country
-      title.value = country.Country
-    }
-    const clearCountryData = async () => {
-      loading.value = true
-      const data = await fetchCovidData()
-      title.value = 'Global'
-      status.value = data.Global
-      loading.value = false
-    }
-    const baseSetup = async () => {
-      const data = await fetchCovidData()
-      dataDate.value = data.Date
-      status.value = data.Global
-      countries.value = data.Countries
-      loading.value = false
-    }
-    baseSetup()
-    return {
-      loading,
-      title,
-      dataDate,
-      status,
-      countries,
-      getCountryData,
-      clearCountryData
-    }
-  }
+
+const loading = ref(true)
+const title = ref('Global')
+const dataDate = ref('')
+const stats = ref({})
+const countries = ref([])
+
+const fetchCovidData = async () => {
+  const res = await fetch('https://api.covid19api.com/summary')
+  return await res.json()
 }
+
+const getCountryData = country => {
+  stats.value = country
+  title.value = country.Country
+}
+
+const clearCountryData = async () => {
+  loading.value = true
+  const data = await fetchCovidData()
+  title.value = 'Global'
+  stats.value = data.Global
+  loading.value = false
+}
+
+const baseSetup = async () => {
+  const data = await fetchCovidData()
+  dataDate.value = data.Date
+  stats.value = data.Global
+  countries.value = data.Countries
+  loading.value = false
+}
+baseSetup()
 </script>

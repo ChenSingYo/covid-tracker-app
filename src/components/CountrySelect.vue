@@ -10,23 +10,25 @@
   </select>
 </template>
 
-<script>
-import { ref } from 'vue'
+<script setup>
+import { ref, defineProps, defineEmits } from 'vue'
 
-export default {
-  name: 'CountrySelect',
-  props: ['countries'],
-  setup (props, { emit }) {
-    const selected = ref(0)
-    return {
-      selected,
-      onChange () {
-        const country = props.countries.find((item) => item.ID === selected.value)
-        emit('get-country', country)
-      }
-    }
+const props = defineProps({
+  countries: {
+    type: Object,
+    require: true
   }
+})
+
+const selected = ref(0)
+
+const emit = defineEmits(['get-country'])
+
+function onChange () {
+  const country = props.countries.find((item) => item.ID === selected.value)
+  emit('get-country', country)
 }
+
 </script>
 
 <style>
